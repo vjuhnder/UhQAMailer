@@ -30,7 +30,7 @@ from email.mime.application import MIMEApplication
 import report
 
 
-def send_email():
+def send_email(job_names, job_url, html_table):
     addressto = "All"
     changeset = "abcdefgh"
     commit_msg = "This is commit message"
@@ -40,7 +40,7 @@ def send_email():
     # TODO: Get commit message
 
     # TODO: Create table
-    html_table = report.create_table()
+    html_table = report.create_table(job_names, job_url)
 
     message = 'Hi ' \
               + addressto \

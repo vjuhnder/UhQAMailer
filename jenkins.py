@@ -30,6 +30,76 @@ JENKINS_PORT = "8080"
 PANIC_MONITOR = "Panic%20Monitor"
 
 
+class PanicMonitor:
+    def __init__(self, server_ip):
+        self.job_names = []
+        self.failed_jobs = []
+        self.succeed_jobs = []
+        self.failed_progress_job = []
+        self.succeed_progress_job = []
+        self.server_ip = server_ip
+        self.job_count = 0
+        self.job_url = []
+        self.sno = []
+        self.job_status = {'name', 'status'}
+
+    def get_jobs_details(self):
+
+        panic_url = 'http://' + self.server_ip + ':' + JENKINS_PORT + '/view/' + PANIC_MONITOR + '/api/json'
+        print(panic_url)
+        json_response = urllib.urlopen(panic_url)
+        json_data = json.loads(json_response.read())
+        json_response.close()
+
+        monitor_jobs = json_data['jobs']
+        self.job_count = 0
+        # parse the jobs array
+        for each_job in monitor_jobs:
+            self.job_count += 1
+            self.sno.append(self.job_count)
+            job_name = each_job['name']
+            self.job_names.append(job_name)
+            self.job_url.append(each_job['url'])
+            status = each_job['color']
+
+            if status == 'blue':
+                self.succeed_jobs.append(job_name)
+                self.job_status.update(job_name, "SUCCESS")
+            elif status == 'red':
+                self.failed_jobs.append(job_name)
+                self.job_status.update(job_name, "FAILED")
+            elif status == "red_anime":
+                self.failed_progress_job(job_name)
+                self.job_status.update(job_name, "FAILED")
+
+    def get_jenkins_server_uri(self):
+
+        jenkins_url = 'http://' + self.server_ip + ':' + JENKINS_PORT
+        print("Jenkins server url..." + jenkins_url)
+
+    def create_table(self):
+        # TODO: Get Job names, Build status and Jenkins URL
+
+        html_table = '<style>table {font-family: arial, sans-serif;border-collapse: collapse;width: 100%;}td, ' \
+                     'th {border: 1px solid #dddddd;text-align: left;padding: 8px;}</style><table><tr><th>S. No</th>' \
+                     '<th>Job Name</th><th>Build Status</th><th>Jenkins URL</th></tr>'
+        #    for job_name in bad_job:
+        #        html_table += '<tr style="color: red;"><td>'+str(no)+'</td><td>'+job_name+'</td><td>FAILED</td><td>
+        #        <a href="%s/job/%s/%s/console"> Jenkins URL </a></tr>' %(jenkins_url, job_name,
+        #        job_details[job_name]['build_number'])
+        index = 0
+        for each_job in self.job_names:
+            html_table += '<tr><td>' \
+                          + self.sno[index] \
+                          + '</td><td>' \
+                          + each_job \
+                          + '</td><td>%s</td><td><a href="%s/job/%s/%s/console"> Jenkins URL </a></tr>' \
+                          % (self.job_status['status'], self.server_ip, each_job, "build_number")
+            index += 1
+        html_table += '</table>'
+
+        return html_table
+
 def get_last_build(changeset):
 
     build_number = changeset
@@ -37,24 +107,9 @@ def get_last_build(changeset):
     return build_number
 
 
-def get_jenkins_server_uri(server_ip):
-
-    jenkins_url = 'http://' + server_ip + ':' + JENKINS_PORT
-    print("Jenkins server url..." + jenkins_url)
 
 
-def get_panic_monitor_job(server_ip):
 
-    panic_url = 'http://' + server_ip + ':' + JENKINS_PORT + '/view/' + PANIC_MONITOR + '/api/json'
-    print(panic_url)
-    json_response = urllib.urlopen(panic_url)
-    json_data = json.loads(json_response.read())
-    json_response.close()
 
-    monitor_jobs = json_data['jobs']
-
-    for each_job in monitor_jobs:
-        build_number = each_job['name']
-        print(build_number)
 
 
