@@ -42,11 +42,11 @@ def main():
     panic_view = jenkins.PanicMonitor(jenkins_ip)
     panic_view.get_jenkins_server_uri()
     panic_view.get_jobs_details()
-    print(panic_view.job_names)
-    print(panic_view.failed_jobs)
-    print(panic_view.succeed_jobs)
+    # print(panic_view.job_names)
+    # print(panic_view.failed_jobs)
+    # print(panic_view.succeed_jobs)
 
-    email_util.send_email(panic_view.job_names, panic_view.job_url, "")
+    email_util.send_email(panic_view.job_names, panic_view.job_url, panic_view.create_table())
     print("Ends fine")
 
 

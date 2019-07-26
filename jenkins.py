@@ -41,15 +41,18 @@ class PanicMonitor:
         self.job_count = 0
         self.job_url = []
         self.sno = []
-        self.job_status = {'name', 'status'}
+        self.job_status = {}
 
-    def get_jobs_details(self):
-
-        panic_url = 'http://' + self.server_ip + ':' + JENKINS_PORT + '/view/' + PANIC_MONITOR + '/api/json'
-        print(panic_url)
-        json_response = urllib.urlopen(panic_url)
+    def get_url_json(self, get_url):
+        get_url += '/api/json'
+        json_response = urllib.urlopen(get_url)
         json_data = json.loads(json_response.read())
         json_response.close()
+        return json_data
+
+    def get_jobs_details(self):
+        get_url = 'http://' + self.server_ip + ':' + JENKINS_PORT + '/view/' + PANIC_MONITOR
+        json_data = self.get_url_json(get_url)
 
         monitor_jobs = json_data['jobs']
         self.job_count = 0
@@ -62,15 +65,20 @@ class PanicMonitor:
             self.job_url.append(each_job['url'])
             status = each_job['color']
 
-            if status == 'blue':
+            if status == 'blue' or status == 'blue_anime':
                 self.succeed_jobs.append(job_name)
-                self.job_status.update(job_name, "SUCCESS")
+                self.job_status[job_name] = "SUCCESS"
             elif status == 'red':
                 self.failed_jobs.append(job_name)
-                self.job_status.update(job_name, "FAILED")
+                self.job_status[job_name] = "FAILED"
             elif status == "red_anime":
                 self.failed_progress_job(job_name)
-                self.job_status.update(job_name, "FAILED")
+                self.job_status[job_name] = "FAILED"
+
+    def get_last_build(self, job_url):
+        json_data = self.get_url_json(job_url)
+        last_build_url = json_data['lastBuild']['url']
+        return last_build_url
 
     def get_jenkins_server_uri(self):
 
@@ -78,33 +86,34 @@ class PanicMonitor:
         print("Jenkins server url..." + jenkins_url)
 
     def create_table(self):
-        # TODO: Get Job names, Build status and Jenkins URL
+        # TODO: Get last build url, console log attachment
 
         html_table = '<style>table {font-family: arial, sans-serif;border-collapse: collapse;width: 100%;}td, ' \
                      'th {border: 1px solid #dddddd;text-align: left;padding: 8px;}</style><table><tr><th>S. No</th>' \
                      '<th>Job Name</th><th>Build Status</th><th>Jenkins URL</th></tr>'
-        #    for job_name in bad_job:
-        #        html_table += '<tr style="color: red;"><td>'+str(no)+'</td><td>'+job_name+'</td><td>FAILED</td><td>
-        #        <a href="%s/job/%s/%s/console"> Jenkins URL </a></tr>' %(jenkins_url, job_name,
-        #        job_details[job_name]['build_number'])
         index = 0
+
+        print (self.job_status)
+
         for each_job in self.job_names:
-            html_table += '<tr><td>' \
-                          + self.sno[index] \
+            if self.job_status[each_job] == "SUCCESS":
+                color = "green"
+            else:
+                color = "red"
+
+            html_table += '<tr style="color: %s;"><td>' %(color) \
+                          + str(self.sno[index]) \
                           + '</td><td>' \
                           + each_job \
-                          + '</td><td>%s</td><td><a href="%s/job/%s/%s/console"> Jenkins URL </a></tr>' \
-                          % (self.job_status['status'], self.server_ip, each_job, "build_number")
+                          + '</td><td>%s</td><td><a href="%s"> Jenkins URL </a></tr>' \
+                          % (self.job_status[each_job], self.get_last_build(self.job_url[index]) + "console")
             index += 1
+
         html_table += '</table>'
 
         return html_table
 
-def get_last_build(changeset):
 
-    build_number = changeset
-    print("Getting last build - number ...")
-    return build_number
 
 
 

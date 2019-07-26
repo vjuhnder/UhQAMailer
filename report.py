@@ -24,25 +24,3 @@
 # END_SOFTWARE_LICENSE_NOTICE
 
 
-def create_table(job_names, job_url):
-    # TODO: Get Job names, Build status and Jenkins URL
-
-    html_table = '<style>table {font-family: arial, sans-serif;border-collapse: collapse;width: 100%;}td, ' \
-                 'th {border: 1px solid #dddddd;text-align: left;padding: 8px;}</style><table><tr><th>S. No</th>' \
-                 '<th>Job Name</th><th>Build Status</th><th>Jenkins URL</th></tr>'
-#    for job_name in bad_job:
-#        html_table += '<tr style="color: red;"><td>'+str(no)+'</td><td>'+job_name+'</td><td>FAILED</td><td>
-#        <a href="%s/job/%s/%s/console"> Jenkins URL </a></tr>' %(jenkins_url, job_name,
-#        job_details[job_name]['build_number'])
-
-    for each_job in job_names:
-        html_table += '<tr><td>' \
-                      + "1" \
-                      + '</td><td>' \
-                      + each_job \
-                      + '</td><td>SUCCESS</td><td><a href="%s/job/%s/%s/console"> Jenkins URL </a></tr>' \
-                      % ("www.google.com", each_job, "description")
-
-    html_table += '</table>'
-
-    return html_table

@@ -39,18 +39,18 @@ def send_email(job_names, job_url, html_table):
     # TODO: Get Changeset
     # TODO: Get commit message
 
-    # TODO: Create table
-    html_table = report.create_table(job_names, job_url)
-
     message = 'Hi ' \
-              + addressto \
-              + ',<br><br>&nbsp;&nbsp;&nbsp;&nbsp;Your commit with <b>changeset:&nbsp;' \
-              + changeset + \
-              '</b>, with changes (<b>' \
-              + commit_msg \
-              + '</b>) is breaking the build.<br><br>' \
-              + html_table \
-              + '<br><br><br>Thanks & Regards, <br> <b>UhDC QA Team</b>'
+              + addressto + ','
+
+    message += '<br><br>&nbsp;&nbsp;&nbsp;&nbsp;Your commit with <b>changeset:&nbsp;' \
+               + changeset \
+               + '</b>, with changes (<b>' \
+               + commit_msg \
+               + '</b>) is breaking the build.<br><br>'
+
+    message += '<br><br>&nbsp;&nbsp;&nbsp;&nbsp;<b>Panic Board Summary<b><br><br>' \
+               + html_table \
+               + '<br><br><br>Thanks & Regards, <br> <b>UhDC QA Team</b>'
 
     msg = MIMEMultipart()
     msg['From'] = 'jenkins@uhnder.com'
