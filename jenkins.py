@@ -23,7 +23,11 @@
 # -------------------------------------------------------------------------------------------------------------------
 # END_SOFTWARE_LICENSE_NOTICE
 
+import json
+import urllib
+
 JENKINS_PORT = "8080"
+PANIC_MONITOR = "Panic%20Monitor"
 
 
 def get_last_build(changeset):
@@ -34,5 +38,23 @@ def get_last_build(changeset):
 
 
 def get_jenkins_server_uri(server_ip):
+
     jenkins_url = 'http://' + server_ip + ':' + JENKINS_PORT
     print("Jenkins server url..." + jenkins_url)
+
+
+def get_panic_monitor_job(server_ip):
+
+    panic_url = 'http://' + server_ip + ':' + JENKINS_PORT + '/view/' + PANIC_MONITOR + '/api/json'
+    print(panic_url)
+    json_response = urllib.urlopen(panic_url)
+    json_data = json.loads(json_response.read())
+    json_response.close()
+
+    monitor_jobs = json_data['jobs']
+
+    for each_job in monitor_jobs:
+        build_number = each_job['name']
+        print(build_number)
+
+

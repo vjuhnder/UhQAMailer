@@ -34,12 +34,15 @@ def main():
     parser = argparse.ArgumentParser(
         description='This script polls for bad_commit.txt in various jobs, and create a one generic e-mail')
     parser.add_argument('--workspace', type=str, default=None, help='workspace for the script')
-    parser.add_argument('--job-names', type=str, nargs='*', default=None, help='Name of the jobs to monitor')
     parser.add_argument('--jenkins-ip', type=str, default=None, help='IP of jenkins')
 
     args = parser.parse_args()
+    jenkins_ip = args.jenkins_ip
+    print(jenkins_ip)
+    jenkins.get_jenkins_server_uri(jenkins_ip)
 
-    jenkins.get_jenkins_server_uri("192.168.44.200")
+    jenkins.get_panic_monitor_job(jenkins_ip)
+
     email_util.send_email()
     print("Ends fine")
 
